@@ -108,4 +108,4 @@ Back matter.
 - 2026-11-08: repository made public, so the "openly available" statement holds.
 - Before submission (human):
   - Optionally mint a Zenodo DOI, which APS prefers.
-  - Confirm the co-author list.
+- 2026-11-08: author list confirmed by P. B. Kadam. All four co-authors stay on the paper: Kadam (corresponding), Gaikwad, Raut and Shitole.
