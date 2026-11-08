@@ -1,0 +1,392 @@
+% Calibration-free discrimination of unresolved sources -- draft for Physical Review A (Regular Article), REVTeX 4.2.
+% Rules: STYLE_AND_VENUE.md. Every number traces to results/*.json via research/CLAIMS_LEDGER.md (S15-S17d).
+% Tables: gen_tables.py. Figures: gen_figures.py. Author and affiliation data from submission/sn-article.tex.
+\documentclass[reprint,pra,aps,amsmath,amssymb,superscriptaddress,nofootinbib]{revtex4-2}
+\usepackage{graphicx}
+\usepackage{bm}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
+\newcommand{\ket}[1]{|#1\rangle}
+\newcommand{\bra}[1]{\langle #1|}
+\newcommand{\sym}{\mathrm{Sym}}
+
+\begin{document}
+
+\title{Calibration-free discrimination of unresolved sources with symmetric multiphoton measurements}
+
+\author{Prathamesh Balasaheb Kadam}
+\email{prathamesh.kadam@aissmsioit.org}
+\author{Prajwal S. Gaikwad}
+\author{Shreyas Subhash Raut}
+\author{Tejas Uttam Shitole}
+\affiliation{Department of Artificial Intelligence and Data Science, AISSMS Institute of Information Technology,
+Pune, India}
+
+\date{\today}
+
+\begin{abstract}
+A single star and a close binary can be told apart at the quantum limit by sorting photons into Hermite-Gauss
+modes, but only if the sorter is aligned with the centroid of the source. We compute exact error exponents for
+this test when the pointing is unknown and must be learned from photons. Measure-first learners estimate the
+centroid by direct imaging of calibration or target photons and then sort modes. They retain a fraction of the
+known-pointing quantum Chernoff exponent that depends only on the calibration budget: 17\%--20\% without
+calibration, and 33\%, 63\% and 69\% with 1, 100 and 1000 calibration photons per target photon, at every
+separation. The residual pointing error turns the zero-background test into a background-limited one, and no
+single-photon receiver that we optimized escapes this limit. Projecting $k$ stored target photons onto the
+symmetric subspace of their transverse states instead has zero background for every pointing offset and every
+static mode crosstalk. It attains a fraction $(k-1)/k$ of the quantum limit without any calibration. Groups of four
+photons already outperform 1000 calibration photons per target photon, and the gain in error exponent is 1.6 to
+5.7. With a single target photon, joint learning keeps a constant 18\% advantage in excess risk over measure-first
+learning, through an interference port that is dark for every pointing. Invariance under translations alone gains
+at most 1\% over the two-photon Hong-Ou-Mandel test.
+\end{abstract}
+
+\maketitle
+
+% =====================================================================================================
+\section{Introduction}
+
+Telling a single star from a close binary below the Rayleigh limit is a hypothesis test. Its quantum limit is
+reached by sorting the light into Hermite-Gauss (HG) modes centered on the source \cite{Tsang2016,Lu2018,Grace2022}.
+The error exponent of direct imaging vanishes as the fourth power of the separation, while the quantum exponent
+vanishes only as its square. The origin of the advantage is simple: a single source sends every photon into the
+fundamental mode, so a photon in any other mode signals a second source.
+
+The same zero-background structure makes the advantage fragile. Crosstalk or misalignment of the sorter leaks
+single-source photons into the signal ports. The simple test then fails, and the optimal test recovers the quantum
+exponent only logarithmically as the leak vanishes \cite{Schlichtholz2023}. A fixed offset removes the support
+mismatch on which the ideal test relies \cite{Kariya2026}. Measurements tailored to a known offset reduce the loss
+but do not remove it \cite{deAlmeida2021}. Existing analyses assume that the centroid is known \cite{Zanforlin2022},
+or treat the offset as fixed. In practice the pointing has to be learned from photons, either from calibration
+exposures or from the target itself \cite{Grace2020}.
+
+This makes the test a problem of learning from quantum data \cite{Sentis2012,Guta2010,Sentis2015}. A measure-first
+learner detects each photon and processes the outcomes classically. A coherent learner can store photons and
+measure them jointly. For estimation, collective measurements that exploit permutation symmetry are robust to
+misalignment \cite{deAlmeida2025}, and two-photon interference beats the Rayleigh limit
+\cite{Parniak2018,Muratore2024}. For discrimination with a learned pointing, neither the cost of calibration nor a
+calibration-free alternative has been quantified.
+
+We compute exact error exponents for both kinds of learner; all predictions were pre-registered
+(Appendix~\ref{app:prereg}). There are three main results.
+\begin{enumerate}
+\item Measure-first learners stay background-limited for any finite calibration budget. They retain a
+  separation-independent fraction of the known-pointing exponent, from 0.17--0.20 without calibration to 0.69 with
+  1000 calibration photons per target photon (Sec.~\ref{sec:classical}).
+\item Symmetric projection of stored photons removes the calibration problem. It has zero background for any
+  pointing and any static crosstalk, attains $(k-1)/k$ of the quantum limit, and gives a 1.6- to 5.7-fold larger
+  exponent (Sec.~\ref{sec:quantum}).
+\item With one target photon, joint learning keeps a constant 18\% advantage through a dark interference port
+  (Sec.~\ref{sec:single}).
+\end{enumerate}
+Section~\ref{sec:invariance} shows that invariance under translations alone gains at most 1\% over the
+Hong-Ou-Mandel (HOM) test, so permutation symmetry is the right invariance. Section~\ref{sec:discussion} discusses
+implementations and limitations.
+
+% =====================================================================================================
+\section{One-versus-two testing with an unknown pointing}
+\label{sec:setting}
+
+We work in one transverse dimension, with a Gaussian point-spread function of unit width. In the weak-source
+regime a photon from a point source at $x$ is in the state $\ket{\psi_x}$, with amplitude
+$\psi(y-x)\propto e^{-(y-x)^2/4}$. In the HG basis these are coherent states of an oscillator,
+$\langle\mathrm{HG}_n|\psi_x\rangle=e^{-a^2/2}a^n/\sqrt{n!}$ with $a=x/2$, and their overlaps are
+$\langle\psi_x|\psi_y\rangle=e^{-(x-y)^2/8}$.
+
+Under $H_0$ every photon is in $\rho_0(\theta)=\ket{\psi_\theta}\bra{\psi_\theta}$. Under $H_1$ it is in
+$\rho_1(\theta)=\tfrac12(\ket{\psi_{\theta+d/2}}\bra{\psi_{\theta+d/2}}+\ket{\psi_{\theta-d/2}}\bra{\psi_{\theta-d/2}})$,
+an equal-brightness binary of separation $d$ with the same centroid. We write $a_0=d/4$. The pointing offset
+$\theta$ is unknown and static. The learner receives $N$ target photons from one hypothesis (equal priors) and,
+optionally, $\kappa N$ labeled calibration photons from a known single source at the same pointing. Performance is
+measured by the error exponent per target photon, $E=\lim_{N\to\infty}-N^{-1}\ln P_{\rm err}$.
+
+If $\theta$ is known, the quantum Chernoff exponent \cite{Audenaert2007,Nussbaum2009} for the pure $\rho_0$ is
+$\xi_Q=-\ln\bra{\psi_\theta}\rho_1\ket{\psi_\theta}=a_0^2$ exactly. It is attained by the null test
+$\{\ket{\psi_\theta}\bra{\psi_\theta},1-\ket{\psi_\theta}\bra{\psi_\theta}\}$, which never clicks under $H_0$ and
+clicks with probability $1-e^{-a_0^2}$ under $H_1$. We report all exponents as fractions of $a_0^2$.
+
+% =====================================================================================================
+\section{Measure-first learners stay background-limited for any calibration budget}
+\label{sec:classical}
+
+A measure-first learner estimates the centroid and then measures the remaining target photons at the estimate.
+Direct imaging attains the quantum Fisher information for the centroid. If the $\kappa N$ calibration photons and a
+fraction $f$ of the target photons are imaged, the residual offset $t=\theta-\hat\theta$ has the large-deviation rate
+$g(t)=(\kappa+f)t^2/2$ per target photon. The other $(1-f)N$ target photons enter a single-photon receiver centered
+at $\hat\theta$, with outcome probabilities $p_{cj}(t)$ under $H_c$. The Bayes error exponent is
+(Appendix~\ref{app:ld})
+\begin{multline}
+E(\kappa,f)=\min_{t_0,t_1}\max_{0\le s\le1}\Big[s\,g(t_0)+(1-s)\,g(t_1)\\
+-(1-f)\ln\sum_j p_{0j}(t_0)^s\,p_{1j}(t_1)^{1-s}\Big],
+\label{eq:ld}
+\end{multline}
+which we maximize over $f$. Here $t_0$ and $t_1$ are the worst-case offsets under the two hypotheses. We evaluate
+Eq.~\eqref{eq:ld} for two receivers:
+\begin{itemize}
+\item HG sorting, with outputs $\mathrm{HG}_0,\dots,\mathrm{HG}_5$ and a rest port;
+\item a real orthogonal six-mode receiver, optimized numerically to maximize Eq.~\eqref{eq:ld}.
+\end{itemize}
+The optimized receiver mixes modes of opposite parity, so its worst case has to be searched over offsets of both
+signs.
+
+\begin{table*}[t]
+\caption{Error exponents per target photon in units of the known-pointing quantum limit $a_0^2$ ($a_0=0.1$).
+Measure-first learners combine direct-imaging centroiding, with $\kappa$ calibration photons per target photon and a
+fraction $f^\ast$ of the target photons, with HG sorting or with an optimized six-mode receiver. ``Coherent
+references'' projects each target photon jointly with $\kappa$ calibration photons onto their symmetric subspace.
+The measure-first values are identical to three digits for $a_0=0.05$ and 0.2. Generated from
+\texttt{results/qx3e/qx3e.json}.}
+\label{tab:exponents}
+\input{tables/tab_exponents.tex}
+\end{table*}
+
+Table~\ref{tab:exponents} and Fig.~\ref{fig:exponents} show the result.
+\begin{itemize}
+\item \emph{No calibration.} HG sorting retains 17.4\% of the quantum limit, spending $f^\ast=0.41$ of the target
+  photons on centroiding. The optimized receiver retains 20.3\%, because it extracts the centroid and the binary
+  signal from the same photons.
+\item \emph{With calibration.} Centroiding on the target stops paying ($f^\ast=0$ for $\kappa\ge1$), and the
+  optimized receiver coincides with HG sorting.
+\item \emph{Slow growth.} The retained fraction $F(\kappa)$ is 33\% at $\kappa=1$, 52\% at 10, 63\% at 100 and 69\%
+  at 1000; an exploratory point gives 82\% at $\kappa=10^8$.
+\end{itemize}
+$F(\kappa)$ is the same for $a_0=0.05$, 0.1 and 0.2. The worst case pairs an offset single source with a centered
+binary, both Poissonian in the mode basis, so the exponent is homogeneous in $a_0^2$ (Appendix~\ref{app:ld}).
+
+\begin{figure}[t]
+\includegraphics[width=\columnwidth]{figures/fig1_exponents.pdf}
+\caption{Error exponent per target photon in units of the known-pointing limit $a_0^2$ ($a_0=0.1$).
+Circles: measure-first learning (direct-imaging centroiding, HG sorting) with $\kappa$ calibration photons per
+target photon; $\kappa=0$ is shown left of the axis break.
+Open square: optimized single-photon receiver at $\kappa=0$.
+Triangles: each target photon projected jointly with $\kappa$ calibration photons onto their symmetric subspace.
+Horizontal lines: symmetric projection of groups of $k$ stored target photons, without calibration.}
+\label{fig:exponents}
+\end{figure}
+
+The mechanism is a background.
+\begin{itemize}
+\item A residual offset $t_0$ sends single-source photons into $\mathrm{HG}_1$ at the rate $u\,a_0^2$, with
+  $u=t_0^2/4a_0^2$, while the binary sends photons there at the rate $a_0^2$.
+\item The Chernoff exponent between these two Poisson rates is $a_0^2h(u)$, with $h(u)=\max_s[su+1-s-u^s]$. It
+  recovers only as $1-[\ln\ln(1/u)-1]/\ln(1/u)$, the law found for crosstalk in Ref.~\cite{Schlichtholz2023}.
+\item Balancing the cost $2(\kappa+f)u$ of a larger offset against this loss gives
+  $E/a_0^2\simeq\min_u[2(\kappa+f)u+(1-f)h(u)]$, which reproduces $F(\kappa)$.
+\end{itemize}
+Every port that carries a second-order signal from the binary also carries a second-order background from the
+offset. Each target photon provides at most unit centroid Fisher information. No single-photon receiver therefore
+escapes the trade-off.
+
+For finite photon numbers we computed the exact Bayes error of three-outcome HG sorting, summing the multinomial
+distribution over the normal residual offset. At $a_0=0.1$ and $N=8000$ it is $1.6\times10^{-13}$ for $\kappa=1$ and
+$3.3\times10^{-20}$ for $\kappa=10$. The local exponents at $N=4000$--8000 agree with Eq.~\eqref{eq:ld} to within 3\%
+(Fig.~\ref{fig:finiteN}).
+
+\begin{figure}[t]
+\includegraphics[width=\columnwidth]{figures/fig2_finite_n.pdf}
+\caption{Exact error probabilities versus the number of target photons $N$ ($a_0=0.1$).
+Circles: measure-first learning with $\kappa=1$ and 10.
+Triangles: symmetric projection in groups of $k=4$ and of all $N$ photons, $P_{\rm err}=\tfrac12h_k^{N/k}$.}
+\label{fig:finiteN}
+\end{figure}
+
+\emph{Takeaway.} Learning the pointing and then measuring cannot recover the quantum advantage. Even 100 calibration
+photons per target photon leave the learner at 63\% of the known-pointing exponent, at every separation.
+
+% =====================================================================================================
+\section{Symmetric projection removes the calibration problem}
+\label{sec:quantum}
+
+A coherent learner can avoid learning $\theta$. It stores $k$ target photons in distinguishable time bins and
+projects their joint transverse state onto the symmetric subspace $\sym^k$.
+\begin{itemize}
+\item \emph{Under $H_0$} the $k$ photons share the pure state $\ket{\psi_\theta}$, so the projection never fails. This
+  holds for every $\theta$ and under any static crosstalk $U$, because $U^{\otimes k}$ preserves $\sym^k$.
+\item \emph{Under $H_1$} the photons are independent copies of $\rho_1(\theta)$, whose eigenvalues
+  $\lambda_\pm=\tfrac12(1\pm e^{-2a_0^2})$ do not depend on $\theta$. The projection succeeds with probability
+  $h_k(\lambda_+,\lambda_-)=\sum_{j=0}^k\lambda_+^j\lambda_-^{k-j}$ (Appendix~\ref{app:sym}).
+\end{itemize}
+Declaring two sources as soon as one group fails gives $P_{\rm err}=\tfrac12h_k^{N/k}$, hence
+\begin{gather}
+E_k=-\tfrac1k\ln h_k(\lambda_+,\lambda_-)\simeq\tfrac{k-1}{k}\,a_0^2,\label{eq:schur}\\
+E_\infty=-\ln\tfrac{1+e^{-2a_0^2}}{2}=a_0^2-\tfrac{a_0^4}{2}+\dots\nonumber
+\end{gather}
+For $k=2$ this is the HOM test.
+
+The exponents are $E_2=0.49$, $E_4=0.74$ and $E_8=0.87$, and $E_\infty=0.9988$, 0.9950 and 0.9800 at $a_0=0.05$, 0.1
+and 0.2, all in units of $a_0^2$ (Table~\ref{tab:exponents}, Fig.~\ref{fig:exponents}).
+\begin{itemize}
+\item \emph{Group sizes.} HOM pairs beat measure-first learning up to about three calibration photons per target
+  photon, triples up to about 100, groups of four at 1000, and groups of eight even at the exploratory
+  $\kappa=10^8$.
+\item \emph{Gain.} Large groups exceed the best measure-first exponent by a factor 4.9--5.7 without calibration,
+  3.0 at $\kappa=1$, 1.9 at $\kappa=10$ and 1.6 at $\kappa=100$.
+\item \emph{Finite $N$.} At $N=8000$ and $a_0=0.1$ the error is about $10^{-35}$, against $1.6\times10^{-13}$ for
+  measure-first learning with $\kappa=1$.
+\end{itemize}
+
+Calibration photons can also be used coherently. Projecting each target photon together with $\kappa$ fresh
+calibration photons fails under $H_1$ with probability $\kappa(1-e^{-a_0^2})/(\kappa+1)$ and never under $H_0$, so
+$E\simeq a_0^2\kappa/(\kappa+1)$. For the same calibration budget this beats measuring the calibration photons by a
+factor 1.5 ($\kappa=1$), 1.7 ($\kappa=10$) and 1.6 ($\kappa=100$).
+
+\emph{Takeaway.} A measurement that is blind to the pointing by symmetry recovers, without calibration, the advantage
+that measure-first learners lose to calibration. Four stored photons beat 1000 calibration photons per target
+photon.
+
+% =====================================================================================================
+\section{With one target photon, joint learning keeps a constant advantage}
+\label{sec:single}
+
+The single-photon version of the problem connects to quantum learning theory \cite{Sentis2012,Guta2010,Sentis2015}.
+\begin{itemize}
+\item \emph{Setting.} Let $\theta\sim\mathcal N(0,\tau^2)$. The learner receives $n$ calibration photons and one
+  target photon. Performance is the excess Bayes risk over the known-pointing error; the known-pointing advantage
+  is $\tfrac12-P_{\rm known}=0.678\,a_0^2$.
+\item \emph{Exact reduction.} The calibration photons are unitarily equivalent to one collective coherent state
+  $\ket{\sqrt n\,\theta/2}$ (Appendix~\ref{app:collective}). This makes the joint Helstrom optimum exactly
+  computable.
+\end{itemize}
+
+Results ($a_0\in\{0.05,0.1,0.2\}$, $\tau\in\{0.2,0.5\}$, $n\le128$; exploratory up to 1024):
+\begin{itemize}
+\item \emph{Constant gap.} Measure-first learning (direct imaging of the calibration photons, then the Bayes test)
+  has an excess risk 1.16--1.19 times that of the joint optimum for $n\ge16$. The factor tends to 1.184 and is
+  independent of $a_0$ to within 1\% [Fig.~\ref{fig:single}(a)].
+\item \emph{Plug-in is nearly optimal.} Estimating $\theta$ and applying the known-pointing Helstrom measurement costs
+  at most 0.8\% extra for $n\ge16$.
+\item \emph{Sign-blind calibration is useless.} HG counting of the calibration photons on the nominal axis recovers
+  95.6\% of the known-pointing advantage at $n=128$, against 95.5\% with no calibration ($\tau=0.2$). Its posterior
+  is symmetric about the axis, so its average spread about the axis equals the prior spread
+  [Fig.~\ref{fig:single}(b)].
+\end{itemize}
+
+\begin{figure}[t]
+\includegraphics[width=\columnwidth]{figures/fig3_single_photon.pdf}
+\caption{One target photon.
+(a) Excess risk of measure-first learning divided by that of the joint optimum ($a_0=0.1$; $a_0=0.05$ and 0.2 agree
+within 1\%). Open circles: exploratory, not pre-registered.
+(b) Fraction of the known-pointing advantage recovered ($\tau=0.5$). Dotted: no calibration.}
+\label{fig:single}
+\end{figure}
+
+The mechanism is an interference port. Interfering the target photon with the collective calibration mode, with
+amplitude weights $\sqrt n:1$, gives an output that is in vacuum under $H_0$ for every $\theta$. Under $H_1$ that
+output carries a $\theta$-independent binary with $a_0^2$ reduced by $n/(n+1)$.
+\begin{itemize}
+\item The joint learner therefore pays for the pointing uncertainty as a slightly smaller separation, with excess
+  risk $\simeq0.678\,a_0^2/(n+1)$. The dark port alone comes within 3\% of the optimum at $n=128$ ($\tau=0.5$).
+\item The measure-first learner pays for it as an incoherent jitter, with excess risk
+  $\simeq c\times0.678\,a_0^2/(n+1/\tau^2)$, where $c\to1.18$.
+\end{itemize}
+A constant asymptotic gap between joint and Gaussian measure-first learning is known for coherent-state templates
+\cite{Sentis2015}. Here it appears in the imaging problem, with a closed-form mechanism.
+
+\emph{Takeaway.} With one target photon the coherent advantage is a modest 18\%. With many photons the same dark-port
+structure removes the background, and the advantage becomes decisive (Sec.~\ref{sec:quantum}).
+
+% =====================================================================================================
+\section{Translation invariance alone buys almost nothing}
+\label{sec:invariance}
+
+Symmetric projection is invariant under every common mode transformation, whereas the physical nuisance is only a
+translation. A measurement invariant under translations alone might therefore extract more information. We tested
+this for two photons sharing a slow common jitter of width $s_j$ and a static random crosstalk on the first 13 HG
+modes.
+\begin{itemize}
+\item \emph{Only the relative coordinate is usable.} A translation-invariant measurement is block diagonal in the
+  total momentum of the pair, and the total momentum is uninformative.
+\item \emph{Its optimum.} The best such measurement refines HOM by projecting the relative coordinate onto its
+  fundamental mode. It clicks under $H_1$ with probability $(1-e^{-d^2/8})/2$, against $(1-e^{-d^2/4})/4$ for HOM.
+\item \emph{The gain.} The relative gain is $2/(1+e^{-d^2/8})-1\simeq d^2/16$: 0.06\%, 0.25\% and 1.0\% at $d=0.1$,
+  0.2 and 0.4, independent of the jitter (Table~\ref{tab:invariance}).
+\item \emph{Fragility.} The coarse version of the test leaks $\approx25\epsilon^2$ under $H_0$ for our crosstalk
+  model, and falls below HOM already at $\epsilon=10^{-4}$.
+\item \emph{Learned measurements.} A two-photon measurement trained over a box of jitter and crosstalk values beats
+  HOM by 0.2\%--1.0\% in the worst case; the best possible pair measurement beats HOM by 0.4\%--1.5\% there. The
+  learned measurement is never below HOM, and is 1.5--1.7 times better than HOM at zero jitter.
+\end{itemize}
+
+\begin{table*}[t]
+\caption{Two-photon exponents relative to HOM. $E_{\rm T}$: optimal translation-invariant measurement (any
+jitter). $E_{\rm pair}$: optimal pair measurement at jitter $s_j$. $\epsilon^\ast$: crosstalk at which the coarse
+translation-invariant test falls below HOM ($s_j=0.4$). Generated from \texttt{results/qx2/qx2.json}.}
+\label{tab:invariance}
+\input{tables/tab_invariance.tex}
+\end{table*}
+
+\emph{Takeaway.} Below the Rayleigh limit, full permutation symmetry costs almost nothing relative to the symmetry of
+the physical nuisance, and it buys immunity to crosstalk.
+
+% =====================================================================================================
+\section{Discussion}
+\label{sec:discussion}
+
+\emph{Implementation.}
+\begin{itemize}
+\item The symmetric projection requires $k$ photons held in a quantum memory and released together. Only the photons
+  within one group need to share the pointing, so drift between groups is harmless.
+\item For $k=2$ it is the HOM test, a beam splitter followed by coincidence detection.
+\item For larger $k$ it is weak Schur sampling of the transverse state. Implementations with atomic memories,
+  multiport devices and linear optics have been proposed for estimation \cite{deAlmeida2025}, and multiport
+  interferometers resolve distinguishability classes of photons \cite{Stanisic2018}.
+\item Imperfect storage reintroduces a background. In a two-photon calculation with the same model (data in the
+  repository), a random mode mismatch of strength $\epsilon$ between the two memories gives an $H_0$ background
+  $\approx3.8\epsilon^2$ for our mismatch model. A differential pointing jitter $s_d$ between the stored photons gives
+  $[1-(1+s_d^2)^{-1/2}]/2\approx s_d^2/4$. Both must stay below the binary signal $\approx a_0^2$.
+\end{itemize}
+
+\emph{Limitations.}
+\begin{itemize}
+\item One transverse dimension, an equal-brightness binary, a Gaussian point-spread function and ideal detectors.
+\item Asymptotic exponents, with a finite-$N$ check at one separation.
+\item The measure-first family consists of direct-imaging centroiding followed by one fixed single-photon receiver.
+  Adaptive multi-stage receivers are not excluded, although each target photon carries at most unit centroid
+  information.
+\end{itemize}
+Unequal brightness (the exoplanet case), two-dimensional pointing and slow drift within a group remain open.
+
+The broader lesson is that a measurement invariant under a nuisance replaces learning the nuisance. For sub-Rayleigh
+discrimination the right invariance is the permutation symmetry of stored photons. Its cost is a quantum memory, not
+more light.
+
+% =====================================================================================================
+\begin{acknowledgments}
+We thank the maintainers of NumPy, SciPy, PyTorch and Matplotlib, on which all numerical work in this paper
+depends. This work received no external funding.
+
+\emph{Use of AI tools.}
+\begin{itemize}
+\item \emph{Tools.} This work made substantive use of Claude Opus 5.5 (Anthropic; model identifier
+  \texttt{claude-opus-5-5}), run through Claude Code. Claude Sonnet 5.5 sub-agents were used for literature
+  searches.
+\item \emph{What it did, under the authors' direction:}
+  \begin{itemize}
+  \item derived the analytic results;
+  \item wrote and ran the simulation code;
+  \item carried out the literature searches and novelty checks;
+  \item drafted the manuscript.
+  \end{itemize}
+\item \emph{Direction and verification.} P.~B.~Kadam directed all of the work: he chose the research questions,
+  approved each stage, and verified and checked all of the calculations reported here by hand.
+\item \emph{Controls.}
+  \begin{itemize}
+  \item Every prediction was committed to a version-controlled pre-registration file before the code that tested
+    it existed.
+  \item All results were computed on the authors' hardware, and every figure and table is regenerated by scripts
+    from version-controlled result files.
+  \end{itemize}
+\end{itemize}
+\end{acknowledgments}
+
+\emph{Data availability.} The code and numerical results that support the findings of this article are openly
+available \cite{QKrepo}.
+
+% =====================================================================================================
+\appendix
+\input{appendix}
+
+\bibliography{refs}
+
+\end{document}

@@ -1,0 +1,152 @@
+% Appendices of the calibration-free discrimination paper (input by main.tex after \appendix).
+
+\section{Large-deviation exponent of measure-first learners}
+\label{app:ld}
+
+Each imaged photon has a position distributed normally around $\theta$ with unit variance. With a flat prior on
+$\theta$, the residual offset $t$ is then normal with variance $[(\kappa+f)N]^{-1}$. (Under $H_1$ the true variance
+of target photons is $1+d^2/4$, so this slightly favors the measure-first learner.) The remaining $M=(1-f)N$ target
+photons give counts $\bm m$, with probability
+\begin{equation}
+P_c(\bm m)=\int dt\,\phi_N(t)\,\mathrm{Mult}\big(\bm m;M,p_c(t)\big)
+\end{equation}
+under $H_c$. Write $x=\bm m/M$ for the empirical distribution. Sanov's theorem and Laplace's method give
+\begin{equation}
+-N^{-1}\ln P_c\to\min_t[g(t)+(1-f)D(x\|p_c(t))].
+\end{equation}
+The Bayes error is dominated by the most likely confusable $x$, so
+$E=\min_{t_0,t_1}\min_x\max_c[g(t_c)+(1-f)D(x\|p_c(t_c))]$. Writing the maximum as a maximum over convex weights
+$s$, exchanging the minimum and maximum (Sion's theorem), and using
+$\min_x[sD(x\|p)+(1-s)D(x\|q)]=-\ln\sum_jp_j^sq_j^{1-s}$ gives Eq.~\eqref{eq:ld}.
+
+\emph{Separation independence.} Under HG sorting a single source at offset $t_0$ gives
+$\mathrm{Poisson}(t_0^2/4)$ mode statistics. A centered binary gives $\mathrm{Poisson}(a_0^2)$, because both emitters
+have $a^2=a_0^2$. For this pair the sum in Eq.~\eqref{eq:ld} is
+$\exp[-st_0^2/4-(1-s)a_0^2+(t_0^2/4)^sa_0^{2(1-s)}]$, and $g(t_0)=2(\kappa+f)a_0^2u$ with $u=t_0^2/4a_0^2$. Every term
+is proportional to $a_0^2$, so $E/a_0^2$ depends on $\kappa$ alone whenever $t_1=0$. The numerically found worst
+case has $|t_1|<10^{-8}d$ at every $\kappa$ and $a_0$.
+
+\emph{Numerical details.} Zero port probabilities restrict the sum to the common support, and the endpoints
+$s\to0^+$ and $1^-$ are taken as one-sided limits. HG sorting satisfies $p_c(t)=p_c(-t)$, so offsets $t\ge0$
+suffice. Receivers that mix modes of opposite parity need offsets of both signs.
+
+\section{Symmetric-projection probabilities}
+\label{app:sym}
+
+Let $\rho=\sum_i\lambda_i\ket{e_i}\bra{e_i}$. The symmetrized occupation-number states $\ket{\bm m}$ ($\sum_im_i=k$)
+built from the $e_i$ form an orthonormal basis of $\sym^k$, and $\rho^{\otimes k}$ acts on $\ket{\bm m}$ with
+eigenvalue $\prod_i\lambda_i^{m_i}$. Hence $\mathrm{Tr}[\Pi_{\sym^k}\rho^{\otimes k}]=h_k(\lambda)$, the complete
+homogeneous symmetric polynomial.
+\begin{itemize}
+\item \emph{Eigenvalues.} For $\rho_1=\tfrac12(\ket\alpha\bra\alpha+\ket\beta\bra\beta)$ with
+  $|\langle\alpha|\beta\rangle|=e^{-d^2/8}=e^{-2a_0^2}$, the eigenvalues are $\lambda_\pm=\tfrac12(1\pm e^{-2a_0^2})$.
+  They are independent of $\theta$ and of any common unitary.
+\item \emph{Invariance under $H_0$.} $(U\ket{\psi_\theta})^{\otimes k}\in\sym^k$ for every $\theta$ and $U$.
+\item \emph{Exponent.} Expanding $h_k=\lambda_+^k\sum_{j=0}^k(\lambda_-/\lambda_+)^j$ gives
+  $E_k\simeq(1-1/k)\lambda_-\simeq\tfrac{k-1}{k}a_0^2$. As $k\to\infty$, $E_k\to-\ln\lambda_+<a_0^2$.
+\end{itemize}
+
+\emph{Projection with calibration photons.} Write $\ket\phi=c\ket\psi+s\ket{\psi^\perp}$; the component
+$\ket\psi^{\otimes n}\ket{\psi^\perp}$ has squared norm $1/(n+1)$ after symmetrization. Hence
+\begin{equation}
+\mathrm{Tr}[\Pi_{\sym^{n+1}}(\ket\psi\bra\psi^{\otimes n}\otimes\ket\phi\bra\phi)]=(1+n|c|^2)/(n+1).
+\end{equation}
+With $|c|^2=|\langle\psi_\theta|\psi_{\theta\pm d/2}\rangle|^2=e^{-a_0^2}$, the projection fails under $H_1$ with
+probability $\kappa(1-e^{-a_0^2})/(\kappa+1)$.
+
+\section{Collective-mode reduction and the dark port}
+\label{app:collective}
+
+\emph{Reduction.} A photon from a point source at $x$ is in the coherent state $\ket{x/2}$ of the HG oscillator. The
+$n$-mode discrete Fourier transform of the photons' ladder operators maps $\ket\alpha^{\otimes n}$ to
+$\ket{\sqrt n\,\alpha}\otimes\ket0^{\otimes(n-1)}$, so the joint states are
+$\Omega_c=\int d\pi(\theta)\,\ket{\sqrt n\theta/2}\bra{\sqrt n\theta/2}\otimes\tau_c(\theta)$. Here
+$\tau_0=\ket{\theta/2}\bra{\theta/2}$ and $\tau_1=\tfrac12\sum_\pm\ket{\theta/2\pm a_0}\bra{\theta/2\pm a_0}$. This
+unitary acts across the transverse degrees of freedom of different photons; it requires stored photons and is not a
+linear-optical operation on them.
+
+\emph{Dark port.} The mode $w=(B-\sqrt n\,b)/\sqrt{n+1}$, built from the collective mode $B$ and the target mode $b$,
+has amplitude $0$ under $H_0$ for every $\theta$ and $\mp a_0\sqrt{n/(n+1)}$ under $H_1$. It therefore carries a
+centered binary with $a_0^2\to a_0^2n/(n+1)$. Its excess risk is $\simeq0.678\,a_0^2/(n+1)$, because the
+known-pointing advantage is $0.678\,a_0^2$.
+
+\emph{Joint optimum.}
+\begin{itemize}
+\item $\theta$ lies on a uniform grid over $\pm6\tau$, with $K\ge161$ points and $n\delta^2/8\le0.01$.
+\item The calibration register is represented in the eigenbasis of
+  $G_{ij}=\sqrt{w_iw_j}\,e^{-n(\theta_i-\theta_j)^2/8}$, keeping eigenvalues above $10^{-13}$ of the maximum (rank
+  7--87). The target photon uses $\mathrm{HG}_0$--$\mathrm{HG}_{24}$.
+\item $P=\tfrac12-\tfrac14\|\Omega_0-\Omega_1\|_1$ follows from an eigendecomposition.
+\item Changing $K\to2K-1$ changes the excess by at most $5\times10^{-9}$ (relative), and changing the threshold to
+  $10^{-11}$ by at most $10^{-12}$.
+\end{itemize}
+
+\emph{Measure-first strategies.}
+\begin{itemize}
+\item \emph{Direct imaging.} The posterior is normal with variance $v=(n+1/\tau^2)^{-1}$, and by translation
+  invariance $P=\tfrac12-\tfrac14\|\sigma_0(v)-\sigma_1(v)\|_1$. Here $\sigma_c(v)$ is the target state averaged over
+  an offset of variance $v$.
+\item \emph{Plug-in.} It replaces the Bayes projector by the known-pointing Helstrom projector.
+\item \emph{HG counting.} It uses the sufficient statistic $S\sim\mathrm{Poisson}(n\theta^2/4)$.
+\end{itemize}
+
+\section{Numerical methods and checks}
+\label{app:numerics}
+
+\emph{Measure-first exponents.}
+\begin{itemize}
+\item Offsets lie on $\{0\}\cup2d\times\{10^{-5},\dots,1\}$ (121 log-spaced points), mirrored for non-even
+  receivers. $s$ uses 101 points with bounded refinement, followed by Nelder-Mead in $(t_0,t_1)$.
+\item The optimized receivers are $W=e^{G-G^T}$ on $\mathrm{HG}_0$--$\mathrm{HG}_5$ plus a rest port, trained by
+  Powell's method with three restarts (one from HG sorting).
+\item The $\kappa=0$ optimum was rechecked on a dense two-sided grid and with 60 random starts.
+\item Finite-$N$ errors use an 80-point Gauss-Hermite quadrature and the full multinomial sum; probability is
+  conserved to $10^{-12}$.
+\end{itemize}
+
+\emph{Two photons.}
+\begin{itemize}
+\item HG pairs with $m+n\le24$, plus an exact remainder outcome; crosstalk acts on $\mathrm{HG}_0$--$\mathrm{HG}_{12}$.
+\item A 20-point Gauss-Hermite jitter rule.
+\item Pair bounds from coherent-state Gram matrices.
+\item Learned measurements are orthogonal maps on the 169-dimensional symmetric subspace, trained with Adam and then
+  L-BFGS.
+\end{itemize}
+
+\emph{Faults fixed before any verdict.} Faulty outputs are archived with the data.
+\begin{enumerate}
+\item A pair space $m+n\le18$, too small for crosstalk on 13 modes.
+\item A one-sided offset search, which the optimized receivers exploited and so appeared 28\%--35\% better than HG
+  sorting.
+\item A memory crash with no output.
+\end{enumerate}
+
+\emph{Software.} Python 3.13.0, NumPy 2.2.4, SciPy 1.15.2, PyTorch 2.11.0. The AI assistance is described in the
+Acknowledgments.
+
+\section{Pre-registered predictions and outcomes}
+\label{app:prereg}
+
+Table~\ref{tab:prereg} lists every prediction behind Secs.~\ref{sec:classical}--\ref{sec:invariance}, each
+committed before the code that tested it.
+\begin{itemize}
+\item \emph{Refuted.} P4: plug-in is within 0.8\% of Bayes, not 1.5--3 times worse, because misalignment enters the
+  Helstrom projector only at second order.
+\item \emph{Partly refuted.}
+  \begin{itemize}
+  \item QE2: the fraction at $\kappa=1$ is 0.334, just below the predicted range.
+  \item QE3: the optimized receiver gains 17\% at $\kappa=0$, against at most 10\% predicted, because it centroids
+    and detects with the same photons.
+  \item QE6: the finite-$N$ exponent approaches its limit non-monotonically at $\kappa=10$.
+  \end{itemize}
+\end{itemize}
+
+\begin{table*}[t]
+\caption{Pre-registered predictions and outcomes. Predictions are quoted from the pre-registration addenda;
+outcomes are generated from the results files. $E_{\rm MF}$, $E_{\rm COH}$, $E_{\rm PLUG}$, $E_{\rm SPADE}$: excess
+risks of measure-first (direct imaging), joint, plug-in and HG-counting learners (Sec.~\ref{sec:single}).
+$E_{\rm T}$, $E_{\rm pair}$, $E_{\rm HOM}$: two-photon exponents (Sec.~\ref{sec:invariance}).}
+\label{tab:prereg}
+\footnotesize
+\input{tables/tab_prereg.tex}
+\end{table*}

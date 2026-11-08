@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.pyc
+# LaTeX build products (main.pdf is kept)
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*Notes.bib
+# local tooling
+.governor/
+.claude/
