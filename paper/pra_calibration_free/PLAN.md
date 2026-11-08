@@ -107,5 +107,5 @@ Back matter.
   - Clean build, 9 pages, no TODOs.
 - 2026-11-08: repository made public, so the "openly available" statement holds.
 - Before submission (human):
-  - Optionally mint a Zenodo DOI, which APS prefers.
+  - Zenodo DOI minted: 10.5281/zenodo.24047739 (v1.0.0), cited in the data availability reference.
 - 2026-11-08: author list confirmed by P. B. Kadam. All four co-authors stay on the paper: Kadam (corresponding), Gaikwad, Raut and Shitole.
