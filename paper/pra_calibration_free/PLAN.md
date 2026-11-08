@@ -105,7 +105,7 @@ Back matter.
   - The project moved to its own repository, prathameshkadam130404/calibration-free-quantum-discrimination
     (private on creation), which the Data Availability Statement now cites.
   - Clean build, 9 pages, no TODOs.
+- 2026-11-08: repository made public, so the "openly available" statement holds.
 - Before submission (human):
-  - Make the repository public, since the statement says "openly available".
   - Optionally mint a Zenodo DOI, which APS prefers.
   - Confirm the co-author list.
