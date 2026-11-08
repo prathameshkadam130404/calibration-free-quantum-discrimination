@@ -1,0 +1,13 @@
+{
+  "title": "Calibration-free discrimination of unresolved sources with symmetric multiphoton measurements: code, numerical results and manuscript",
+  "description": "Code, numerical results, pre-registration records, novelty checks and REVTeX manuscript (submitted to Physical Review A) for the paper 'Calibration-free discrimination of unresolved sources with symmetric multiphoton measurements'. Measure-first learners that calibrate the telescope pointing retain only a separation-independent fraction of the known-pointing quantum Chernoff exponent, whereas symmetric projection of stored photons needs no calibration and reaches (k-1)/k of the quantum limit.",
+  "upload_type": "software",
+  "license": "MIT",
+  "creators": [
+    {"name": "Kadam, Prathamesh Balasaheb", "affiliation": "AISSMS Institute of Information Technology, Pune, India", "orcid": "0009-0006-9211-4647"},
+    {"name": "Gaikwad, Prajwal S.", "affiliation": "AISSMS Institute of Information Technology, Pune, India", "orcid": "0000-0003-0805-9130"},
+    {"name": "Raut, Shreyas Subhash", "affiliation": "AISSMS Institute of Information Technology, Pune, India", "orcid": "0009-0007-8900-9560"},
+    {"name": "Shitole, Tejas Uttam", "affiliation": "AISSMS Institute of Information Technology, Pune, India", "orcid": "0009-0004-2175-8723"}
+  ],
+  "keywords": ["quantum imaging", "superresolution", "quantum hypothesis testing", "quantum machine learning", "weak Schur sampling", "Hong-Ou-Mandel", "spatial-mode demultiplexing"]
+}
